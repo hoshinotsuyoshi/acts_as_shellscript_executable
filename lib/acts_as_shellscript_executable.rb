@@ -16,6 +16,7 @@ module ActsAsShellscriptExecutable
   class Railtie
     def self.insert
       if defined?(ActiveRecord)
+        require 'active_record'
         ActiveRecord::Base.send(:include, ActiveRecord::Acts::ShellscriptExecutable)
       end
     end
