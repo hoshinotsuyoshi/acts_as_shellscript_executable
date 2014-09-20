@@ -25,15 +25,30 @@ describe ActiveRecord::Base do
       it do
         script = Script.create
         script.script = 'echo "lalala"'
+        expect{script.execute!}.to_not \
+          change{script.result}
+      end
+    end
+
+    context 'given option {script: :script, stdout: :result}' do
+      before do
+        class Script < ActiveRecord::Base
+          acts_as_shellscript_executable script: :script, stdout: :result
+        end
+      end
+
+      it do
+        script = Script.create
+        script.script = 'echo "lalala"'
         expect{script.execute!}.to \
           change{script.result}.from(nil).to("lalala\n")
       end
     end
 
-    context 'given option {script: :script2}' do
+    context 'given option {script: :script2, stdout: :result}' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable script: :script2
+          acts_as_shellscript_executable script: :script2, stdout: :result
         end
       end
 

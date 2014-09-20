@@ -25,7 +25,10 @@ module ActiveRecord
         def execute!
           script = configuration[:script]
           retval = %x(#{self.send script})
-          self.result = retval
+          stdout = configuration[:stdout]
+          if stdout && self.respond_to?("#{stdout}=".to_sym)
+            self.send("#{stdout}=".to_sym, retval)
+          end
           self.save!
         end
 
