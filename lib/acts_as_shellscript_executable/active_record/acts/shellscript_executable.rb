@@ -13,15 +13,16 @@ module ActiveRecord
           class_eval <<-EOV
             include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
 
-            ### some dynamics...
-            def a_method
-              '#{}'
-            end
           EOV
         end
       end
 
       module InstanceMethods
+        def execute!
+          retval = %x(#{self.script})
+          self.result = retval
+          self.save!
+        end
       end
     end
   end
