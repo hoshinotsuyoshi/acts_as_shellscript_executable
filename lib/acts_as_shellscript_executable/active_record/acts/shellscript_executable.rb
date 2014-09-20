@@ -25,29 +25,26 @@ module ActiveRecord
         def execute!
           script = configuration[:script]
           stdout = configuration[:stdout]
-          forker = configuration[:fork]
-          if forker
-            fork do
-              retval = %x(#{self.send script})
-              if stdout && self.respond_to?("#{stdout}=".to_sym)
-                self.send("#{stdout}=".to_sym, retval)
-              end
-              self.save!
-            end
+          if configuration[:fork]
+            fork { execute(script, stdout) }
             # for test
             Process.wait if ENV['test']
           else
-            retval = %x(#{self.send script})
-            if stdout && self.respond_to?("#{stdout}=".to_sym)
-              self.send("#{stdout}=".to_sym, retval)
-            end
-            self.save!
+            execute(script, stdout)
           end
         end
 
         private
         def configuration
           self.class.configuration
+        end
+
+        def execute(script, stdout)
+          retval = %x(#{send script})
+          if stdout && respond_to?("#{stdout}=".to_sym)
+            send("#{stdout}=".to_sym, retval)
+          end
+          save!
         end
       end
     end
