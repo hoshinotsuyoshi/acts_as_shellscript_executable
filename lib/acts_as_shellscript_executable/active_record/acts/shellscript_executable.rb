@@ -24,12 +24,25 @@ module ActiveRecord
       module InstanceMethods
         def execute!
           script = configuration[:script]
-          retval = %x(#{self.send script})
           stdout = configuration[:stdout]
-          if stdout && self.respond_to?("#{stdout}=".to_sym)
-            self.send("#{stdout}=".to_sym, retval)
+          forker = configuration[:fork]
+          if forker
+            fork do
+              retval = %x(#{self.send script})
+              if stdout && self.respond_to?("#{stdout}=".to_sym)
+                self.send("#{stdout}=".to_sym, retval)
+              end
+              self.save!
+            end
+            # for test
+            Process.wait if ENV['test']
+          else
+            retval = %x(#{self.send script})
+            if stdout && self.respond_to?("#{stdout}=".to_sym)
+              self.send("#{stdout}=".to_sym, retval)
+            end
+            self.save!
           end
-          self.save!
         end
 
         private
