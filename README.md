@@ -1,6 +1,27 @@
 # ActsAsShellscriptExecutable
 
-TODO: Write a gem description
+
+    class Script < ActiveRecord::Base
+      acts_as_shellscript_executable script: :script, stdout: :result
+    end
+
+### before:
+
+| id  | name  | script | result |
+| :------|:------ |:---------------|:-----|
+| 1  | foo   | echo 'lalala' |  |
+
+
+### execute:
+
+    script = Script.find(1)
+    script.execute!
+
+### after:
+    
+| id  | name  | script | result |
+| :------|:------ |:---------------|:-----|
+| 1  | foo   | echo 'lalala' | lalala |
 
 ## Installation
 
@@ -15,10 +36,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install acts_as_shellscript_executable
-
-## Usage
-
-TODO: Write usage instructions here
 
 ## Contributing
 
