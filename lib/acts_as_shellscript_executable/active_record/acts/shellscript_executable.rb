@@ -7,21 +7,44 @@ module ActiveRecord
 
       module ClassMethods
         def acts_as_shellscript_executable(options = {})
-          configuration = { script: :script, stdout: nil }
-          configuration.update(options) if options.is_a?(Hash)
+          @@configuration = { script: :script, stdout: nil }
+          @@configuration.update(options) if options.is_a?(Hash)
 
           class_eval <<-EOV
             include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
 
           EOV
         end
+
+        def configuration
+          @@configuration
+        end
       end
 
       module InstanceMethods
         def execute!
-          retval = %x(#{self.script})
-          self.result = retval
-          self.save!
+          script = configuration[:script]
+          stdout = configuration[:stdout]
+          if configuration[:fork]
+            fork { execute(script, stdout) }
+            # for test
+            Process.wait if ENV['test']
+          else
+            execute(script, stdout)
+          end
+        end
+
+        private
+        def configuration
+          self.class.configuration
+        end
+
+        def execute(script, stdout)
+          retval = %x(#{send script})
+          if stdout && respond_to?("#{stdout}=".to_sym)
+            send("#{stdout}=".to_sym, retval)
+          end
+          save!
         end
       end
     end
