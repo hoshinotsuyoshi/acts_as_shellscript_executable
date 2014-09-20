@@ -5,7 +5,7 @@ require 'acts_as_shellscript_executable/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "acts_as_shellscript_executable"
-  spec.version       = ActsAsShellscriptExecutable::VERSION
+  spec.version       = ActiveRecord::Acts::ShellscriptExecutable::VERSION
   spec.authors       = ["hoshinotsuyoshi"]
   spec.email         = ["guitarpopnot330@gmail.com"]
   spec.summary       = %q{TODO: Write a short summary. Required.}
