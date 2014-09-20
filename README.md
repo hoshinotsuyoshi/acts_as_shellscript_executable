@@ -1,5 +1,9 @@
 # ActsAsShellscriptExecutable
 
+[![travis-batch](https://travis-ci.org/hoshinotsuyoshi/acts_as_shellscript_executable.svg)](https://travis-ci.org/hoshinotsuyoshi/acts_as_shellscript_executable)
+[![Coverage Status](https://coveralls.io/repos/hoshinotsuyoshi/acts_as_shellscript_executable/badge.png)](https://coveralls.io/r/hoshinotsuyoshi/acts_as_shellscript_executable)
+[![Code Climate](https://codeclimate.com/github/hoshinotsuyoshi/acts_as_shellscript_executable/badges/gpa.svg)](https://codeclimate.com/github/hoshinotsuyoshi/acts_as_shellscript_executable)
+
 
     class Script < ActiveRecord::Base
       acts_as_shellscript_executable script: :script, stdout: :result
