@@ -7,13 +7,24 @@ module ActiveRecord
 
       module ClassMethods
         def acts_as_shellscript_executable(options = {})
-          @@configuration = { script: :script, stdout: nil }
+          @@configuration = { method: :execute!, script: :script, stdout: nil }
           @@configuration.update(options) if options.is_a?(Hash)
 
           class_eval <<-EOV
-            include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
-
+            def #{@@configuration[:method].to_s}
+              script = configuration[:script]
+              stdout = configuration[:stdout]
+              if configuration[:fork]
+                fork { execute(script, stdout) }
+                # for test
+                Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
+              else
+                execute(script, stdout)
+              end
+            end
           EOV
+
+          include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
 
         def configuration
@@ -22,18 +33,6 @@ module ActiveRecord
       end
 
       module InstanceMethods
-        def execute!
-          script = configuration[:script]
-          stdout = configuration[:stdout]
-          if configuration[:fork]
-            fork { execute(script, stdout) }
-            # for test
-            Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
-          else
-            execute(script, stdout)
-          end
-        end
-
         private
         def configuration
           self.class.configuration
