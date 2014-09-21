@@ -104,5 +104,20 @@ describe ActiveRecord::Base do
           change{script.result}.from(nil).to("lalala\n")
       end
     end
+
+    context 'given option {script: "echo 1;", stdout: :result}' do
+      before do
+        class Script < ActiveRecord::Base
+          acts_as_shellscript_executable script: "echo 1;", stdout: :result
+        end
+      end
+
+      it do
+        script = Script.create
+        script.script  = 'echo "hehehe"'
+        expect{script.execute!}.to \
+          change{script.result}.from(nil).to("1\n")
+      end
+    end
   end
 end
