@@ -12,9 +12,9 @@ module ActiveRecord
 
           class_eval <<-EOV
             def #{@@configuration[:method].to_s}
-              script = configuration[:script]
-              stdout = configuration[:stdout]
-              if configuration[:fork]
+              script = @@__configuration__[:script]
+              stdout = @@__configuration__[:stdout]
+              if @@__configuration__[:fork]
                 fork { execute(script, stdout) }
                 # for test
                 Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
@@ -24,20 +24,13 @@ module ActiveRecord
             end
           EOV
 
+          self.class_variable_set(:@@__configuration__, @@configuration)
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
-        end
-
-        def configuration
-          @@configuration
         end
       end
 
       module InstanceMethods
         private
-        def configuration
-          self.class.configuration
-        end
-
         def execute(script, stdout)
           script = case script
                    when Symbol
