@@ -7,11 +7,11 @@ module ActiveRecord
 
       module ClassMethods
         def acts_as_shellscript_executable(options = {})
-          @@configuration = { method: :execute!, script: :script, stdout: nil }
-          @@configuration.update(options) if options.is_a?(Hash)
+          configuration = { method: :execute!, script: :script, stdout: nil }
+          configuration.update(options) if options.is_a?(Hash)
 
           class_eval <<-EOV
-            def #{@@configuration[:method].to_s}
+            def #{configuration[:method].to_s}
               script = @@__configuration__[:script]
               stdout = @@__configuration__[:stdout]
               if @@__configuration__[:fork]
@@ -24,7 +24,7 @@ module ActiveRecord
             end
           EOV
 
-          self.class_variable_set(:@@__configuration__, @@configuration)
+          self.class_variable_set(:@@__configuration__, configuration)
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
