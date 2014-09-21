@@ -1,12 +1,12 @@
 require 'spec_helper'
-require 'fileutils'
+require 'tmpdir'
 
 describe ActiveRecord::Base do
   describe '.acts_as_shellscript_executable' do
     def db_setup!
       # use not-in-memory-sqlite-db. because of fork
-      FileUtils.rm_f 'db.sqlite3'
-      ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: "db.sqlite3")
+      db_dir = Dir.mktmpdir('db')
+      ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: "#{db_dir}/db.sqlite3")
       ActiveRecord::Schema.verbose = false
       ActiveRecord::Base.connection.schema_cache.clear!
       ActiveRecord::Schema.define(version: 1) do
