@@ -20,6 +20,7 @@ describe ActiveRecord::Base do
 
     before do
       db_setup!
+      ENV['test_wait_child'] = 'true'
     end
 
     context 'given option {script: :script}' do
@@ -132,6 +133,28 @@ describe ActiveRecord::Base do
         script.script  = 'echo "hehehe"'
         expect{script.execute!}.to \
           change{script.result}.from(nil).to("1\n2\n")
+      end
+    end
+
+    context 'given option {script: "echo 1\nsleep 1\necho 2", stdout: :result, fork: true}' do
+      before do
+        ENV['test_wait_child'] = 'false'
+        class Script < ActiveRecord::Base
+          acts_as_shellscript_executable script: "echo 1\nsleep 1\necho 2", stdout: :result, fork: true
+        end
+      end
+
+      it do
+        script = Script.create
+        script.script  = 'echo "hehehe"'
+        script.execute!
+        watcher = []
+        @time = Time.now
+        while Time.now - @time < 2
+          watcher << Script.find(1).result.to_s
+          sleep 0.2
+        end
+        expect(watcher.uniq.sort).to eq ['', "1\n", "1\n2\n"]
       end
     end
   end

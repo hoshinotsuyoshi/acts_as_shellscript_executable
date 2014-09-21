@@ -28,7 +28,7 @@ module ActiveRecord
           if configuration[:fork]
             fork { execute(script, stdout) }
             # for test
-            Process.wait if ENV['test']
+            Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
           else
             execute(script, stdout)
           end
@@ -40,16 +40,19 @@ module ActiveRecord
         end
 
         def execute(script, stdout)
-          retval = case script
+          script = case script
                    when Symbol
-                     %x(#{send script})
+                     send script
                    when String
-                     %x(#{script})
+                     script
                    end
-          if stdout && respond_to?("#{stdout}=".to_sym)
-            send("#{stdout}=".to_sym, retval)
+          script.split("\n").each do |line|
+            retval = %x(#{line})
+            if stdout && respond_to?("#{stdout}=".to_sym)
+              send("#{stdout}=".to_sym, send(stdout).to_s + retval)
+            end
+            save!
           end
-          save!
         end
       end
     end
