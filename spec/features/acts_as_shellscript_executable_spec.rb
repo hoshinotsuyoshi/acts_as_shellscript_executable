@@ -155,7 +155,8 @@ describe ActiveRecord::Base do
           watcher << Script.find(1).result.to_s
           sleep 0.2
         end
-        expect(watcher.uniq.sort).to eq ['', "1\n", "1\n2\n"]
+        expect(watcher.uniq).to be_include "1\n"
+        expect(watcher.uniq).to be_include "1\n2\n"
       end
     end
 
