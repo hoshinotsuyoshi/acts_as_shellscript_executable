@@ -40,12 +40,12 @@ module ActiveRecord
         end
 
         def execute(script, stdout)
-          case script
-          when Symbol
-            retval = %x(#{send script})
-          when String
-            retval = %x(#{script})
-          end
+          retval = case script
+                   when Symbol
+                     %x(#{send script})
+                   when String
+                     %x(#{script})
+                   end
           if stdout && respond_to?("#{stdout}=".to_sym)
             send("#{stdout}=".to_sym, retval)
           end
