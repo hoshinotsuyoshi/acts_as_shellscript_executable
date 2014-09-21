@@ -83,6 +83,7 @@ describe ActiveRecord::Base do
 
         it do
           # reset object because of fork
+          sleep 1
           @script = Script.find @script.id
           expect(@script.result).not_to equal nil
           expect(@script.result).not_to eq("#{Process.pid}\n")
