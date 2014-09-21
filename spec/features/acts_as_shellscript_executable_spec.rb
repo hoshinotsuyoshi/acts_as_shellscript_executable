@@ -83,6 +83,7 @@ describe ActiveRecord::Base do
 
         it do
           # reset object because of fork
+          sleep 1
           @script = Script.find @script.id
           expect(@script.result).not_to equal nil
           expect(@script.result).not_to eq("#{Process.pid}\n")
@@ -155,6 +156,21 @@ describe ActiveRecord::Base do
           sleep 0.2
         end
         expect(watcher.uniq.sort).to eq ['', "1\n", "1\n2\n"]
+      end
+    end
+
+    context 'given option {method: :awesome_execute!, script: :script, stdout: :result}' do
+      before do
+        class Script < ActiveRecord::Base
+          acts_as_shellscript_executable method: :awesome_execute!, script: :script, stdout: :result
+        end
+      end
+
+      it do
+        script = Script.create
+        script.script = 'echo "lalala"'
+        expect{script.awesome_execute!}.to \
+          change{script.result}.from(nil).to("lalala\n")
       end
     end
   end

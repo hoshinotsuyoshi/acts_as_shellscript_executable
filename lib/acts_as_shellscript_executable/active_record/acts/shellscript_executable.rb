@@ -7,38 +7,30 @@ module ActiveRecord
 
       module ClassMethods
         def acts_as_shellscript_executable(options = {})
-          @@configuration = { script: :script, stdout: nil }
-          @@configuration.update(options) if options.is_a?(Hash)
+          configuration = { method: :execute!, script: :script, stdout: nil }
+          configuration.update(options) if options.is_a?(Hash)
 
           class_eval <<-EOV
-            include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
-
+            def #{configuration[:method].to_s}
+              script = @@__configuration__[:script]
+              stdout = @@__configuration__[:stdout]
+              if @@__configuration__[:fork]
+                fork { execute(script, stdout) }
+                # for test
+                Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
+              else
+                execute(script, stdout)
+              end
+            end
           EOV
-        end
 
-        def configuration
-          @@configuration
+          self.class_variable_set(:@@__configuration__, configuration)
+          include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
 
       module InstanceMethods
-        def execute!
-          script = configuration[:script]
-          stdout = configuration[:stdout]
-          if configuration[:fork]
-            fork { execute(script, stdout) }
-            # for test
-            Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
-          else
-            execute(script, stdout)
-          end
-        end
-
         private
-        def configuration
-          self.class.configuration
-        end
-
         def execute(script, stdout)
           script = case script
                    when Symbol
