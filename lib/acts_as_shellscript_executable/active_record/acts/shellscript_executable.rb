@@ -15,11 +15,11 @@ module ActiveRecord
               script = @@__configuration__[:script]
               stdout = @@__configuration__[:stdout]
               if @@__configuration__[:fork]
-                fork { execute(script, stdout) }
+                fork { __execute__(script, stdout) }
                 # for test
                 Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
               else
-                execute(script, stdout)
+                __execute__(script, stdout)
               end
             end
           EOV
@@ -31,7 +31,7 @@ module ActiveRecord
 
       module InstanceMethods
         private
-        def execute(script, stdout)
+        def __execute__(script, stdout)
           script = case script
                    when Symbol
                      send script
