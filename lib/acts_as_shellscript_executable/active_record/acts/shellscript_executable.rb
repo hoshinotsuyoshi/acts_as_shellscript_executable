@@ -1,3 +1,5 @@
+require 'thread'
+
 module ActiveRecord
   module Acts
     module ShellscriptExecutable
@@ -11,15 +13,16 @@ module ActiveRecord
           configuration.update(options) if options.is_a?(Hash)
 
           class_eval <<-EOV
-            def #{configuration[:method].to_s}
+            def #{configuration[:method].to_s}(&block)
               script = @@__configuration__[:script]
-              stdout = @@__configuration__[:stdout]
+              answer = ''
               if @@__configuration__[:fork]
-                fork { __execute__(script, stdout) }
-                # for test
-                Process.wait if ENV['test'] && ENV['test_wait_child'] == 'true'
+                Thread.new do
+                  __execute__(script, answer, block)
+                end
+                block_given? ? nil : answer
               else
-                __execute__(script, stdout)
+                __execute__(script, answer)
               end
             end
           EOV
@@ -31,20 +34,22 @@ module ActiveRecord
 
       module InstanceMethods
         private
-        def __execute__(script, stdout)
+        def __execute__(script, answer, block=nil)
           script = case script
                    when Symbol
                      send script
                    when String
                      script
                    end
+          retval = []
           script.split("\n").each do |line|
-            retval = %x(#{line})
-            if stdout && respond_to?("#{stdout}=".to_sym)
-              send("#{stdout}=".to_sym, send(stdout).to_s + retval)
+            if block
+              block.call( %x(#{line}))
+            else
+              retval << %x(#{line})
             end
-            save!
           end
+          answer.replace retval.join
         end
       end
     end
