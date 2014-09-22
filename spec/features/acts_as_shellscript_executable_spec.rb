@@ -3,9 +3,14 @@ require 'spec_helper'
 describe ActiveRecord::Base do
   describe '.acts_as_shellscript_executable' do
     def db_setup!
-      ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+      ActiveRecord::Base.establish_connection \
+        adapter: 'sqlite3', database: ':memory:'
       ActiveRecord::Schema.verbose = false
       ActiveRecord::Base.connection.schema_cache.clear!
+      db_schema_define!
+    end
+
+    def db_schema_define!
       ActiveRecord::Schema.define(version: 1) do
         create_table :scripts do |t|
           t.column :script,  :string
@@ -85,7 +90,7 @@ describe ActiveRecord::Base do
     context 'given option { script: "echo 1;" }' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable script: "echo 1;"
+          acts_as_shellscript_executable script: 'echo 1;'
         end
       end
 
@@ -114,7 +119,8 @@ describe ActiveRecord::Base do
     context 'given option {script: "echo 1\nsleep 1\necho 2" parallel: true}' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable script: "echo 1\nsleep 1\necho 2", parallel: true
+          acts_as_shellscript_executable \
+            script: "echo 1\nsleep 1\necho 2", parallel: true
         end
       end
 
@@ -130,15 +136,16 @@ describe ActiveRecord::Base do
           sleep 2
 
           expect(retval).to be_nil
-          expect(watcher).to eq ["1\n", "", "2\n"]
+          expect(watcher).to eq ["1\n", '', "2\n"]
         end
       end
     end
 
-    context 'given option {method: :awesome_execute!, script: "echo 1\nsleep 1\necho 2", parallel: true}' do
+    context 'given option {method: :awesome!}' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable method: :awesome_execute!, script: "echo 1\nsleep 1\necho 2", parallel: true
+          acts_as_shellscript_executable \
+            method: :awesome!, script: "echo 1\nsleep 1\necho 2", parallel: true
         end
       end
 
@@ -147,14 +154,14 @@ describe ActiveRecord::Base do
           script = Script.create
           watcher = []
 
-          retval = script.awesome_execute! do |each_line_result|
+          retval = script.awesome! do |each_line_result|
             watcher << each_line_result
           end
 
           sleep 2
 
           expect(retval).to be_nil
-          expect(watcher).to eq ["1\n", "", "2\n"]
+          expect(watcher).to eq ["1\n", '', "2\n"]
         end
       end
     end
