@@ -1,0 +1,5 @@
+Documentation:
+  Enabled: false
+AllCops:
+  Exclude:
+    - acts_as_shellscript_executable.gemspec
