@@ -9,14 +9,14 @@ module ActiveRecord
 
       module ClassMethods
         def acts_as_shellscript_executable(options = {})
-          configuration = { method: :execute!, script: :script, stdout: nil }
+          configuration = { method: :execute!, script: :script }
           configuration.update(options) if options.is_a?(Hash)
 
           class_eval <<-EOV
             def #{configuration[:method].to_s}(&block)
               script = @@__configuration__[:script]
               answer = ''
-              if @@__configuration__[:fork]
+              if @@__configuration__[:parallel]
                 Thread.new do
                   __execute__(script, answer, block)
                 end

@@ -33,11 +33,11 @@ describe ActiveRecord::Base do
       end
     end
 
-    describe 'given option fork' do
-      context 'given option {script: :script, stdout: :result, fork: false}' do
+    describe 'given option parallel' do
+      context 'given option {script: :script, parallel: false}' do
         before do
           class Script < ActiveRecord::Base
-            acts_as_shellscript_executable script: :script, stdout: :result, fork: false
+            acts_as_shellscript_executable script: :script, parallel: false
           end
         end
 
@@ -48,10 +48,10 @@ describe ActiveRecord::Base do
         end
       end
 
-      context '[forking] given option {script: :script, stdout: :result, fork: true}' do
+      context 'given option {script: :script, parallel: true}' do
         before do
           class Script < ActiveRecord::Base
-            acts_as_shellscript_executable script: :script, stdout: :result, fork: true
+            acts_as_shellscript_executable script: :script, parallel: true
           end
         end
 
@@ -67,10 +67,10 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {script: :script2, stdout: :result}' do
+    context 'given option { script: :script2 }' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable script: :script2, stdout: :result
+          acts_as_shellscript_executable script: :script2
         end
       end
 
@@ -82,10 +82,10 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {script: "echo 1;", stdout: :result}' do
+    context 'given option { script: "echo 1;" }' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable script: "echo 1;", stdout: :result
+          acts_as_shellscript_executable script: "echo 1;"
         end
       end
 
@@ -96,10 +96,10 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {script: "echo 1\necho 2", stdout: :result}' do
+    context 'given option {script: "echo 1\necho 2"}' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable script: "echo 1\necho 2", stdout: :result
+          acts_as_shellscript_executable script: "echo 1\necho 2"
         end
       end
 
@@ -111,10 +111,10 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {script: "echo 1\nsleep 1\necho 2", stdout: :result, fork: true}' do
+    context 'given option {script: "echo 1\nsleep 1\necho 2" parallel: true}' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable script: "echo 1\nsleep 1\necho 2", stdout: :result, fork: true
+          acts_as_shellscript_executable script: "echo 1\nsleep 1\necho 2", parallel: true
         end
       end
 
@@ -135,10 +135,10 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {method: :awesome_execute!, script: "echo 1\nsleep 1\necho 2", stdout: :result, fork: true}' do
+    context 'given option {method: :awesome_execute!, script: "echo 1\nsleep 1\necho 2", parallel: true}' do
       before do
         class Script < ActiveRecord::Base
-          acts_as_shellscript_executable method: :awesome_execute!, script: "echo 1\nsleep 1\necho 2", stdout: :result, fork: true
+          acts_as_shellscript_executable method: :awesome_execute!, script: "echo 1\nsleep 1\necho 2", parallel: true
         end
       end
 
