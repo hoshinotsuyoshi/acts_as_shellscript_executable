@@ -16,7 +16,7 @@
 
 ```ruby
 class Script < ActiveRecord::Base
-  acts_as_shellscript_executable script: :script, stdout: :result
+  acts_as_shellscript_executable script: :script
 end
 ```
 
