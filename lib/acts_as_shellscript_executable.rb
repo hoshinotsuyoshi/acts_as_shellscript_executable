@@ -18,7 +18,8 @@ module ActsAsShellscriptExecutable
     def self.insert
       if defined?(ActiveRecord)
         require 'active_record'
-        ActiveRecord::Base.include ActiveRecord::Acts::ShellscriptExecutable
+        ActiveRecord::Base.send \
+          :include, ActiveRecord::Acts::ShellscriptExecutable
       end
     end
   end
