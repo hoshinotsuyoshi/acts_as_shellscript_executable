@@ -1,5 +1,6 @@
 require 'acts_as_shellscript_executable/version'
-require 'acts_as_shellscript_executable/active_record/acts/shellscript_executable'
+require 'acts_as_shellscript_executable/active_record/' \
+          'acts/shellscript_executable'
 
 module ActsAsShellscriptExecutable
   if defined? Rails::Railtie
@@ -17,7 +18,7 @@ module ActsAsShellscriptExecutable
     def self.insert
       if defined?(ActiveRecord)
         require 'active_record'
-        ActiveRecord::Base.send(:include, ActiveRecord::Acts::ShellscriptExecutable)
+        ActiveRecord::Base.include ActiveRecord::Acts::ShellscriptExecutable
       end
     end
   end
