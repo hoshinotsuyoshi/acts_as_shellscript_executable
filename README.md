@@ -5,10 +5,6 @@
 [![Code Climate](https://codeclimate.com/github/hoshinotsuyoshi/acts_as_shellscript_executable/badges/gpa.svg)](https://codeclimate.com/github/hoshinotsuyoshi/acts_as_shellscript_executable)
 
 
-    class Script < ActiveRecord::Base
-      acts_as_shellscript_executable script: :script, stdout: :result
-    end
-
 ### before:
 
 | id  | name  | script | result |
@@ -18,8 +14,17 @@
 
 ### execute:
 
-    script = Script.find(1)
-    script.execute!
+```ruby
+class Script < ActiveRecord::Base
+  acts_as_shellscript_executable script: :script, stdout: :result
+end
+```
+
+```ruby
+script = Script.find(1)
+script.result = script.execute!
+script.save!
+```
 
 ### after:
     
