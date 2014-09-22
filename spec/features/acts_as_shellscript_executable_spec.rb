@@ -1,12 +1,9 @@
 require 'spec_helper'
-require 'tmpdir'
 
 describe ActiveRecord::Base do
   describe '.acts_as_shellscript_executable' do
     def db_setup!
-      # use not-in-memory-sqlite-db. because of fork
-      db_dir = Dir.mktmpdir('db')
-      ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: "#{db_dir}/db.sqlite3")
+      ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
       ActiveRecord::Schema.verbose = false
       ActiveRecord::Base.connection.schema_cache.clear!
       ActiveRecord::Schema.define(version: 1) do
@@ -20,7 +17,6 @@ describe ActiveRecord::Base do
 
     before do
       db_setup!
-      ENV['test_wait_child'] = 'true'
     end
 
     context 'given option {script: :script}' do
@@ -47,7 +43,7 @@ describe ActiveRecord::Base do
 
         it do
           script = Script.create
-          script.script = 'echo $PPID' # this $PPID is equal to $$
+          script.script = 'echo $PPID'
           expect(script.execute!).to eq "#{Process.pid}\n"
         end
       end
@@ -61,7 +57,7 @@ describe ActiveRecord::Base do
 
         it do
           script = Script.create
-          script.script = "sleep 1\necho $PPID" # when fork, this $PPID is not equal to $$
+          script.script = "sleep 1\necho $PPID"
           result = script.execute!
 
           expect(result).to eq('')
