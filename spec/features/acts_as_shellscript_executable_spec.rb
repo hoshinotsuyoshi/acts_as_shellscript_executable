@@ -1,29 +1,29 @@
 require 'spec_helper'
 
 describe ActiveRecord::Base do
-  describe '.acts_as_shellscript_executable' do
-    def db_setup!
-      ActiveRecord::Base.establish_connection \
-        adapter: 'sqlite3', database: ':memory:'
-      ActiveRecord::Schema.verbose = false
-      ActiveRecord::Base.connection.schema_cache.clear!
-      db_schema_define!
-    end
+  def db_setup!
+    ActiveRecord::Base.establish_connection \
+      adapter: 'sqlite3', database: ':memory:'
+    ActiveRecord::Schema.verbose = false
+    ActiveRecord::Base.connection.schema_cache.clear!
+    db_schema_define!
+  end
 
-    def db_schema_define!
-      ActiveRecord::Schema.define(version: 1) do
-        create_table :scripts do |t|
-          t.column :script,  :string
-          t.column :script2, :string
-          t.column :result,  :string
-        end
+  def db_schema_define!
+    ActiveRecord::Schema.define(version: 1) do
+      create_table :scripts do |t|
+        t.column :script,  :string
+        t.column :script2, :string
+        t.column :result,  :string
       end
     end
+  end
 
-    before do
-      db_setup!
-    end
+  before do
+    db_setup!
+  end
 
+  describe '.acts_as_shellscript_executable' do
     context 'given option {script: :script}' do
       before do
         class Script < ActiveRecord::Base
@@ -121,6 +121,22 @@ describe ActiveRecord::Base do
 
         expect(result).to eq "1\n2\n"
         expect(awesome_result).to eq "3\n4\n"
+      end
+    end
+  end
+
+  describe '.acts_as_rubyscript_executable' do
+    context 'given option {script: :script}' do
+      before do
+        class Script < ActiveRecord::Base
+          acts_as_rubyscript_executable script: :script
+        end
+      end
+
+      it do
+        script = Script.create
+        script.script = 'puts "lalala"'
+        expect(script.ruby_execute!).to eq "lalala\n"
       end
     end
   end
