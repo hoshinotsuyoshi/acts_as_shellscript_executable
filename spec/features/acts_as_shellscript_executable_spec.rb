@@ -38,40 +38,6 @@ describe ActiveRecord::Base do
       end
     end
 
-    describe 'given option parallel' do
-      context 'given option {script: :script, parallel: false}' do
-        before do
-          class Script < ActiveRecord::Base
-            acts_as_shellscript_executable script: :script, parallel: false
-          end
-        end
-
-        it do
-          script = Script.create
-          script.script = 'echo $PPID'
-          expect(script.execute!).to eq "#{Process.pid}\n"
-        end
-      end
-
-      context 'given option {script: :script, parallel: true}' do
-        before do
-          class Script < ActiveRecord::Base
-            acts_as_shellscript_executable script: :script, parallel: true
-          end
-        end
-
-        it do
-          script = Script.create
-          script.script = "sleep 1\necho $PPID"
-          result = script.execute!
-
-          expect(result).to eq('')
-          sleep 1.5
-          expect(result).to eq("#{Process.pid}\n")
-        end
-      end
-    end
-
     context 'given option { script: :script2 }' do
       before do
         class Script < ActiveRecord::Base
@@ -116,31 +82,6 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {script: "echo 1\nsleep 1\necho 2" parallel: true}' do
-      before do
-        class Script < ActiveRecord::Base
-          acts_as_shellscript_executable \
-            script: "echo 1\nsleep 1\necho 2", parallel: true
-        end
-      end
-
-      describe 'block given' do
-        it do
-          script = Script.create
-          watcher = []
-
-          retval = script.execute! do |each_line_result|
-            watcher << each_line_result
-          end
-
-          sleep 2
-
-          expect(retval).to be_nil
-          expect(watcher).to eq ["1\n", '', "2\n"]
-        end
-      end
-    end
-
     context 'given option {script: "echo 1\necho 2"}' do
       before do
         class Script < ActiveRecord::Base
@@ -160,31 +101,6 @@ describe ActiveRecord::Base do
 
           expect(retval).to be_nil
           expect(watcher).to eq ["1\n", "2\n"]
-        end
-      end
-    end
-
-    context 'given option {method: :awesome!}' do
-      before do
-        class Script < ActiveRecord::Base
-          acts_as_shellscript_executable \
-            method: :awesome!, script: "echo 1\nsleep 1\necho 2", parallel: true
-        end
-      end
-
-      describe 'block given' do
-        it do
-          script = Script.create
-          watcher = []
-
-          retval = script.awesome! do |each_line_result|
-            watcher << each_line_result
-          end
-
-          sleep 2
-
-          expect(retval).to be_nil
-          expect(watcher).to eq ["1\n", '', "2\n"]
         end
       end
     end

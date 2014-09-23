@@ -1,5 +1,3 @@
-require 'thread'
-
 module ActiveRecord
   module Acts
     module ShellscriptExecutable
@@ -16,15 +14,8 @@ module ActiveRecord
             def #{configuration[:method]}(&block)
               script = @@__configuration__[:script]
               answer = ''
-              if @@__configuration__[:parallel]
-                Thread.new do
-                  __execute__(script, answer, block)
-                end
-                block_given? ? nil : answer
-              else
-                __execute__(script, answer, block)
-                block_given? ? nil : answer
-              end
+              __execute__(script, answer, block)
+              block_given? ? nil : answer
             end
           EOV
 
