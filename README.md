@@ -31,10 +31,25 @@ script.save!
 | :---|:----- |:--------------|:-------|
 | 1   | foo   | echo 'lalala' | lalala |
 
-## Options
+## #execute!
 
-* `parallel` (default: false)
+* `#execute!(nil)`
+    * returns scripts stdout of whole of the shellscript
+
+* `#execute!(block)`
+    * returns `nil`, yields the shellscript's stdout st each line(splited by `\n`)
+
+## Options of `.acts_as_shellscript_executable`
+
+* `script:` (default: `:script`)
+    * if `Symbol`, the same name column's value will be evaluated as shellscript
+    * if `String`, the string will be evaluated as shellscript
+
+* `parallel:` (default: `false`)
     * if true, the script will run in parallel by using `thread`
+
+* `method:` (default: `execute!`)
+    * the execute method's name
 
 ## Installation
 
