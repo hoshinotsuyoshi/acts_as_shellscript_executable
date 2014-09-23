@@ -9,17 +9,23 @@ module ActiveRecord
         def acts_as_shellscript_executable(options = {})
           configuration = { method: :execute!, script: :script }
           configuration.update(options) if options.is_a?(Hash)
-
+          method = configuration[:method]
           class_eval <<-EOV
-            def #{configuration[:method]}(&block)
-              script = @@__configuration__[:script]
+            def #{method}(&block)
+              script = @@__configurations__[:#{method}][:script]
               answer = ''
               __execute__(script, answer, block)
               block_given? ? nil : answer
             end
           EOV
 
-          class_variable_set(:@@__configuration__, configuration)
+          configurations = begin
+                             class_variable_get(:@@__configurations__)
+                           rescue NameError
+                             {}
+                           end
+          configurations[method] = configuration
+          class_variable_set(:@@__configurations__, configurations)
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
