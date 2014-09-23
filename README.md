@@ -33,7 +33,7 @@ script.save!
 
 ## #execute!
 
-* `#execute!(nil)`
+* `#execute!(no args)`
     * returns scripts stdout of whole of the shellscript
 
 * `#execute!(block)`
@@ -44,9 +44,6 @@ script.save!
 * `script:` (default: `:script`)
     * if `Symbol`, the same name column's value will be evaluated as shellscript
     * if `String`, the string will be evaluated as shellscript
-
-* `parallel:` (default: `false`)
-    * if true, the script will run in parallel by using `thread`
 
 * `method:` (default: `execute!`)
     * the execute method's name
