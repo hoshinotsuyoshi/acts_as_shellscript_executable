@@ -139,5 +139,27 @@ describe ActiveRecord::Base do
         expect(script.ruby_execute!).to eq "lalala\n"
       end
     end
+
+    context 'given option {script: "puts 1\nputs 2"}' do
+      before do
+        class Script < ActiveRecord::Base
+          acts_as_rubyscript_executable script: "puts 1\nputs 2"
+        end
+      end
+
+      describe 'block given' do
+        it do
+          script = Script.create
+          watcher = []
+
+          retval = script.ruby_execute! do |each_line_result|
+            watcher << each_line_result
+          end
+
+          expect(retval).to be_nil
+          expect(watcher).to eq ["1\n", "2\n"]
+        end
+      end
+    end
   end
 end
