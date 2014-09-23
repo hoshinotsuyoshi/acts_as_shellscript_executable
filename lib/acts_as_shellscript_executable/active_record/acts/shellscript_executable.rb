@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module ActiveRecord
   module Acts
     module ShellscriptExecutable
@@ -72,13 +74,21 @@ module ActiveRecord
         def __ruby_execute__(script, answer, block = nil)
           script = send script if script.is_a? Symbol
           retval = []
-          script.split("\n").each do |line|
+
+          path = Tempfile.open('') do |temp|
+            temp.puts 'STDOUT.sync = true'
+            temp.puts script
+            temp.path
+          end
+
+          IO.popen(['ruby', path], err: [:child, :out]).each do |io|
             if block
-              block.call `ruby -e '#{line}'`
+              block.call io
             else
-              retval << `ruby -e '#{line}'`
+              retval << io
             end
           end
+
           answer.replace retval.join
         end
       end
