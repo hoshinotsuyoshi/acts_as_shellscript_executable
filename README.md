@@ -34,7 +34,7 @@ script.save!
 ## #execute!
 
 * `#execute!(no args)`
-    * returns the shellscript's stdout of whole of the shellscript
+    * returns scripts stdout of whole of the shellscript
 
 * `#execute!(block)`
     * returns `nil`, yields the shellscript's stdout st each line(splited by `\n`)
@@ -47,13 +47,6 @@ script.save!
 
 * `method:` (default: `execute!`)
     * the execute method's name
-
-## Options of `.acts_as_rubyscript_executable`
-
-* same as `.acts_as_shellscript_executable`
-
-* `ruby:` (default: `'ruby'`)
-    * Set path like `'/usr/bin/ruby'`, or array to set option like `['ruby', '-c']`, `['bundle exec rails', 'r']`
 
 ## Installation
 
