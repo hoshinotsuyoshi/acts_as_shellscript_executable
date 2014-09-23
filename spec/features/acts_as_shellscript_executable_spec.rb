@@ -104,7 +104,7 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {script: "echo 1\necho 2"}' do
+    context 'given 2 options' do
       before do
         class Script < ActiveRecord::Base
           acts_as_shellscript_executable \
@@ -159,6 +159,26 @@ describe ActiveRecord::Base do
           expect(retval).to be_nil
           expect(watcher).to eq ["1\n", "2\n"]
         end
+      end
+    end
+
+    context 'given 2 options' do
+      before do
+        class Script < ActiveRecord::Base
+          acts_as_rubyscript_executable \
+            script: "puts 1\nputs 2"
+          acts_as_rubyscript_executable \
+            script: "puts 3\nputs 4", method: :awesome!
+        end
+      end
+
+      it do
+        script = Script.create
+        result = script.ruby_execute!
+        awesome_result = script.awesome!
+
+        expect(result).to eq "1\n2\n"
+        expect(awesome_result).to eq "3\n4\n"
       end
     end
   end
