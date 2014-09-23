@@ -33,7 +33,7 @@ module ActiveRecord
 
         def acts_as_rubyscript_executable(options = {})
           configuration = {
-            method: :ruby_execute!, script: :script, ruby: ['ruby']
+            method: :ruby_execute!, script: :script, ruby: 'ruby'
           }
           configuration.update(options) if options.is_a?(Hash)
           method = configuration[:method]

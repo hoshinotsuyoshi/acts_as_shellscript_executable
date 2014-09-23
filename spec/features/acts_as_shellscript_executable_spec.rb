@@ -185,6 +185,29 @@ describe ActiveRecord::Base do
       end
     end
 
+    context 'given option {ruby: "ruby"}' do
+      before do
+        class Script < ActiveRecord::Base
+          acts_as_rubyscript_executable \
+            script: "puts 1\nputs 2", ruby: 'ruby'
+        end
+      end
+
+      describe 'block given' do
+        it do
+          script = Script.create
+          watcher = []
+
+          retval = script.ruby_execute! do |each_line_result|
+            watcher << each_line_result
+          end
+
+          expect(retval).to be_nil
+          expect(watcher).to eq ["1\n", "2\n"]
+        end
+      end
+    end
+
     context 'given 2 options' do
       before do
         class Script < ActiveRecord::Base
