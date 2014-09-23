@@ -22,7 +22,8 @@ module ActiveRecord
                 end
                 block_given? ? nil : answer
               else
-                __execute__(script, answer)
+                __execute__(script, answer, block)
+                block_given? ? nil : answer
               end
             end
           EOV
