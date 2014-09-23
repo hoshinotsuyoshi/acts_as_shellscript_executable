@@ -7,10 +7,9 @@
 
 ### before:
 
-| id  | name  | script | result |
-| :------|:------ |:---------------|:-----|
-| 1  | foo   | echo 'lalala' |  |
-
+| id  | name  | script        | result |
+| :---|:----- |:--------------|:-------|
+| 1   | foo   | echo 'lalala' |        |
 
 ### execute:
 
@@ -27,10 +26,15 @@ script.save!
 ```
 
 ### after:
-    
-| id  | name  | script | result |
-| :------|:------ |:---------------|:-----|
-| 1  | foo   | echo 'lalala' | lalala |
+
+| id  | name  | script        | result |
+| :---|:----- |:--------------|:-------|
+| 1   | foo   | echo 'lalala' | lalala |
+
+## Options
+
+* `parallel` (default: false)
+    * if true, the script will run in parallel by using `thread`
 
 ## Installation
 
@@ -48,7 +52,7 @@ Or install it yourself as:
 
 ## Contributing
 
-1. Fork it ( http://github.com/<my-github-username>/acts_as_shellscript_executable/fork )
+1. Fork it ( http://github.com/hoshinotsuyoshi/acts_as_shellscript_executable/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
