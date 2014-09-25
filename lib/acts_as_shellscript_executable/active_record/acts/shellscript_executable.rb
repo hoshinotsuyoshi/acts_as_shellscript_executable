@@ -32,14 +32,17 @@ module ActiveRecord
         end
 
         def acts_as_rubyscript_executable(options = {})
-          configuration = { method: :ruby_execute!, script: :script }
+          configuration = {
+            method: :ruby_execute!, script: :script, ruby: 'ruby'
+          }
           configuration.update(options) if options.is_a?(Hash)
           method = configuration[:method]
           class_eval <<-EOV
             def #{method}(&block)
               script = @@__ruby_configs__[:#{method}][:script]
+              ruby   = @@__ruby_configs__[:#{method}][:ruby]
               answer = ''
-              __ruby_execute__(script, answer, block)
+              __ruby_execute__(script, answer, ruby, block)
               block_given? ? nil : answer
             end
           EOV
@@ -71,7 +74,7 @@ module ActiveRecord
           answer.replace retval.join
         end
 
-        def __ruby_execute__(script, answer, block = nil)
+        def __ruby_execute__(script, answer, ruby, block = nil)
           script = send script if script.is_a? Symbol
           retval = []
 
@@ -81,7 +84,7 @@ module ActiveRecord
             temp.path
           end
 
-          IO.popen(['ruby', path], err: [:child, :out]).each do |io|
+          IO.popen([*ruby, path], err: [:child, :out]).each do |io|
             if block
               block.call io
             else
