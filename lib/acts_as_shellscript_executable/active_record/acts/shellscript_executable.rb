@@ -8,16 +8,26 @@ module ActiveRecord
       end
 
       module ClassMethods
-        def define_execute_method(method, inner_method, config_var)
+        def __define_execute_method(method, inner_method, config_var)
           class_eval <<-EOV
             def #{method}(&block)
-              script = #{config_var.to_s}[:#{method}][:script]
-              command  = #{config_var.to_s}[:#{method}][:command]
+              script = #{config_var}[:#{method}][:script]
+              command  = #{config_var}[:#{method}][:command]
               answer = ''
-              #{inner_method.to_s}(script, answer, command, block)
+              #{inner_method}(script, answer, command, block)
               block_given? ? nil : answer
             end
           EOV
+        end
+
+        def __configs_set(config_var, configuration, method)
+          configurations = begin
+                             class_variable_get(config_var)
+                           rescue NameError
+                             {}
+                           end
+          configurations[method] = configuration
+          class_variable_set(config_var, configurations)
         end
 
         def acts_as_shellscript_executable(options = {})
@@ -27,15 +37,10 @@ module ActiveRecord
           configuration[:command] = configuration[:shell]
           method = configuration[:method]
 
-          define_execute_method(method, :__execute__, :@@__shell_configs__)
+          __define_execute_method \
+            method, :__execute__, :@@__shell_configs__
+          __configs_set(:@@__shell_configs__, configuration, method)
 
-          configurations = begin
-                             class_variable_get(:@@__shell_configs__)
-                           rescue NameError
-                             {}
-                           end
-          configurations[method] = configuration
-          class_variable_set(:@@__shell_configs__, configurations)
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
 
@@ -46,15 +51,10 @@ module ActiveRecord
           configuration[:command] = configuration[:ruby]
           method = configuration[:method]
 
-          define_execute_method(method, :__ruby_execute__, :@@__ruby_configs__)
+          __define_execute_method \
+            method, :__ruby_execute__, :@@__ruby_configs__
+          __configs_set(:@@__ruby_configs__, configuration, method)
 
-          configurations = begin
-                             class_variable_get(:@@__ruby_configs__)
-                           rescue NameError
-                             {}
-                           end
-          configurations[method] = configuration
-          class_variable_set(:@@__ruby_configs__, configurations)
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
