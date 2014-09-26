@@ -20,14 +20,14 @@ module ActiveRecord
           EOV
         end
 
-        def __configs_set(config_var, command, script, method)
+        def __configs_set(command, script, method)
           configurations = begin
-                             class_variable_get(config_var)
+                             class_variable_get(:@@__executable_methods__)
                            rescue NameError
                              {}
                            end
           configurations[method] = { command: command, script: script }
-          class_variable_set(config_var, configurations)
+          class_variable_set(:@@__executable_methods__, configurations)
         end
 
         def acts_as_shellscript_executable(opt)
@@ -42,8 +42,7 @@ module ActiveRecord
           method ||= (type == :ruby ? :ruby_execute! : :execute!)
           command ||= (type == :ruby ? 'ruby' : '/bin/sh')
           __define_execute_method method, type
-          __configs_set \
-            :@@__executable_methods__, command, script, method
+          __configs_set command, script, method
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
