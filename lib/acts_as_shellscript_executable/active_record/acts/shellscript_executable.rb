@@ -8,11 +8,11 @@ module ActiveRecord
       end
 
       module ClassMethods
-        def __define_execute_method(method, type, config_var)
+        def __define_execute_method(method, type)
           class_eval <<-EOV
             def #{method}(&block)
-              script = #{config_var}[:#{method}][:script]
-              command  = #{config_var}[:#{method}][:command]
+              script = @@__executable_methods__[:#{method}][:script]
+              command  = @@__executable_methods__[:#{method}][:command]
               answer = ''
               __execute__(script, :#{type}, answer, command, block)
               block_given? ? nil : answer
@@ -31,16 +31,16 @@ module ActiveRecord
         end
 
         def acts_as_shellscript_executable(method: :execute!, script: :script, shell: '/bin/sh')
-          __define_execute_method method, :shell, :@@__shell_configs__
+          __define_execute_method method, :shell
           __configs_set \
-            :@@__shell_configs__, { command: shell, script: script }, method
+            :@@__executable_methods__, { command: shell, script: script }, method
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
 
         def acts_as_rubyscript_executable(method: :ruby_execute!, script: :script, ruby: 'ruby')
-          __define_execute_method method, :ruby, :@@__ruby_configs__
+          __define_execute_method method, :ruby
           __configs_set \
-            :@@__ruby_configs__, { command: ruby, script: script }, method
+            :@@__executable_methods__, { command: ruby, script: script }, method
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
