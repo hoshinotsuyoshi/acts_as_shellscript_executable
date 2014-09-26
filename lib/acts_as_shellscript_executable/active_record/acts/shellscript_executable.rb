@@ -52,23 +52,21 @@ module ActiveRecord
 
         def __execute__(script, type, answer, command, block = nil)
           script = send script if script.is_a? Symbol
+          path = __temp_script_path(script, type)
 
-          path = Tempfile.open('') do |temp|
+          retval = []
+          IO.popen([*command, path], err: [:child, :out]).each do |io|
+            block ? block.call(io) : retval << io
+          end
+          answer.replace retval.join
+        end
+
+        def __temp_script_path(script, type)
+          Tempfile.open('') do |temp|
             temp.puts 'STDOUT.sync = true' if type == :ruby
             temp.puts script
             temp.path
           end
-
-          retval = []
-          IO.popen([*command, path], err: [:child, :out]).each do |io|
-            if block
-              block.call io
-            else
-              retval << io
-            end
-          end
-
-          answer.replace retval.join
         end
       end
     end
