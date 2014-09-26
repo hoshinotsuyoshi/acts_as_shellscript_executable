@@ -30,17 +30,17 @@ module ActiveRecord
           class_variable_set(config_var, configurations)
         end
 
-        def acts_as_shellscript_executable(method: :execute!, script: :script, shell: '/bin/sh')
+        def acts_as_shellscript_executable(method: :execute!, script: :script, command: '/bin/sh')
           __define_execute_method method, :shell
           __configs_set \
-            :@@__executable_methods__, { command: shell, script: script }, method
+            :@@__executable_methods__, { command: command, script: script }, method
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
 
-        def acts_as_rubyscript_executable(method: :ruby_execute!, script: :script, ruby: 'ruby')
+        def acts_as_rubyscript_executable(method: :ruby_execute!, script: :script, command: 'ruby')
           __define_execute_method method, :ruby
           __configs_set \
-            :@@__executable_methods__, { command: ruby, script: script }, method
+            :@@__executable_methods__, { command: command, script: script }, method
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
