@@ -30,31 +30,17 @@ module ActiveRecord
           class_variable_set(config_var, configurations)
         end
 
-        def acts_as_shellscript_executable(options = {})
-          configuration = {
-            method: :execute!, script: :script, shell: '/bin/sh'
-          }.update(options)
-          configuration[:command] = configuration[:shell]
-          method = configuration[:method]
-
-          __define_execute_method \
-            method, :shell, :@@__shell_configs__
-          __configs_set(:@@__shell_configs__, configuration, method)
-
+        def acts_as_shellscript_executable(method: :execute!, script: :script, shell: '/bin/sh')
+          __define_execute_method method, :shell, :@@__shell_configs__
+          __configs_set \
+            :@@__shell_configs__, { command: shell, script: script }, method
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
 
-        def acts_as_rubyscript_executable(options = {})
-          configuration = {
-            method: :ruby_execute!, script: :script, ruby: 'ruby'
-          }.update(options)
-          configuration[:command] = configuration[:ruby]
-          method = configuration[:method]
-
-          __define_execute_method \
-            method, :ruby, :@@__ruby_configs__
-          __configs_set(:@@__ruby_configs__, configuration, method)
-
+        def acts_as_rubyscript_executable(method: :ruby_execute!, script: :script, ruby: 'ruby')
+          __define_execute_method method, :ruby, :@@__ruby_configs__
+          __configs_set \
+            :@@__ruby_configs__, { command: ruby, script: script }, method
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
         end
       end
