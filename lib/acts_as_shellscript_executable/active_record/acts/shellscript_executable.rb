@@ -8,13 +8,13 @@ module ActiveRecord
       end
 
       module ClassMethods
-        def __define_execute_method(method, inner_method, config_var)
+        def __define_execute_method(method, type, config_var)
           class_eval <<-EOV
             def #{method}(&block)
               script = #{config_var}[:#{method}][:script]
               command  = #{config_var}[:#{method}][:command]
               answer = ''
-              #{inner_method}(script, answer, command, block)
+              __execute__(script, :#{type}, answer, command, block)
               block_given? ? nil : answer
             end
           EOV
@@ -38,7 +38,7 @@ module ActiveRecord
           method = configuration[:method]
 
           __define_execute_method \
-            method, :__execute__, :@@__shell_configs__
+            method, :shell, :@@__shell_configs__
           __configs_set(:@@__shell_configs__, configuration, method)
 
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
@@ -52,7 +52,7 @@ module ActiveRecord
           method = configuration[:method]
 
           __define_execute_method \
-            method, :__ruby_execute__, :@@__ruby_configs__
+            method, :ruby, :@@__ruby_configs__
           __configs_set(:@@__ruby_configs__, configuration, method)
 
           include ::ActiveRecord::Acts::ShellscriptExecutable::InstanceMethods
@@ -62,37 +62,17 @@ module ActiveRecord
       module InstanceMethods
         private
 
-        def __execute__(script, answer, shell, block = nil)
+        def __execute__(script, type, answer, command, block = nil)
           script = send script if script.is_a? Symbol
-          retval = []
 
           path = Tempfile.open('') do |temp|
+            temp.puts 'STDOUT.sync = true' if type == :ruby
             temp.puts script
             temp.path
           end
 
-          IO.popen([*shell, path], err: [:child, :out]).each do |io|
-            if block
-              block.call io
-            else
-              retval << io
-            end
-          end
-
-          answer.replace retval.join
-        end
-
-        def __ruby_execute__(script, answer, ruby, block = nil)
-          script = send script if script.is_a? Symbol
           retval = []
-
-          path = Tempfile.open('') do |temp|
-            temp.puts 'STDOUT.sync = true'
-            temp.puts script
-            temp.path
-          end
-
-          IO.popen([*ruby, path], err: [:child, :out]).each do |io|
+          IO.popen([*command, path], err: [:child, :out]).each do |io|
             if block
               block.call io
             else
