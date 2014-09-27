@@ -48,11 +48,18 @@ script.save!
 * `method:` (default: `execute!`)
     * the execute method's name
 
+* `command:` (default: `'/bin/sh'`)
+
 ## Options of `.acts_as_rubyscript_executable`
 
-* same as `.acts_as_shellscript_executable`
+* `script:` (default: `:script`)
+    * if `Symbol`, the same name column's value will be evaluated as shellscript
+    * if `String`, the string will be evaluated as shellscript
 
-* `ruby:` (default: `'ruby'`)
+* `method:` (default: `ruby_execute!`)
+    * the execute method's name
+
+* `command:` (default: `'ruby'`)
     * Set path like `'/usr/bin/ruby'`, or array to set option like `['ruby', '-c']`, `['bundle exec rails', 'r']`
 
 ## Installation
