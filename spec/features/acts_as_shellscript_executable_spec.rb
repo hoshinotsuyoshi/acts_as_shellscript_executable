@@ -162,11 +162,11 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {ruby: ["ruby", "-c"]}' do
+    context 'given option {command: ["ruby", "-c"]}' do
       before do
         class Script < ActiveRecord::Base
           acts_as_rubyscript_executable \
-            script: "puts 1\nputs 2", ruby: ['ruby', '-c']
+            script: "puts 1\nputs 2", command: ['ruby', '-c']
         end
       end
 
@@ -185,11 +185,11 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {ruby: "ruby"}' do
+    context 'given option {command: "ruby"}' do
       before do
         class Script < ActiveRecord::Base
           acts_as_rubyscript_executable \
-            script: "puts 1\nputs 2", ruby: 'ruby'
+            script: "puts 1\nputs 2", command: 'ruby'
         end
       end
 
@@ -208,11 +208,11 @@ describe ActiveRecord::Base do
       end
     end
 
-    context 'given option {ruby: "ruby"}, magic comment with non-ascii' do
+    context 'given option {command: "ruby"}, magic comment with non-ascii' do
       before do
         class Script < ActiveRecord::Base
           acts_as_rubyscript_executable \
-            script: "#! coding:utf-8\nputs 1\nputs '日本語'", ruby: 'ruby'
+            script: "#! coding:utf-8\nputs 1\nputs '日本語'", command: 'ruby'
         end
       end
 
